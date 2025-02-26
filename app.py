@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_("index.html"), request, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -84,7 +84,7 @@ def fetch_awb_data(awb_number):
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_("index.html")
 
 @app.route('/process', methods=['POST'])
 def process():
