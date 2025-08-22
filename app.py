@@ -1,4 +1,4 @@
-from flask import Flask, render_("index.html"), request, jsonify
+from flask import Flask, render_template, request, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,6 +8,17 @@ from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
 import time
 from bs4 import BeautifulSoup
+def make_headless_driver():
+    """Create a headless Chrome WebDriver (stable for CI/servers)."""
+    options = webdriver.ChromeOptions()
+    # Modern headless mode
+    options.add_argument("--headless=new")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--window-size=1280,800")
+    service = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(service=service, options=options)
+
 
 app = Flask(__name__)
 
@@ -27,6 +38,7 @@ def fetch_awb_data(awb_number):
     # Selenium setup
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
+    driver = make_headless_driver()
 
     try:
         driver.get("https://jumpseat.atlasair.com/aa/tracktracehtml/TrackTrace.html?pe=403&se=21678591")
@@ -84,7 +96,7 @@ def fetch_awb_data(awb_number):
 
 @app.route('/')
 def index():
-    return render_("index.html")
+    return render_template("index.html")
 
 @app.route('/process', methods=['POST'])
 def process():
